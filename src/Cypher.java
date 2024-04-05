@@ -1,19 +1,34 @@
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 
 public class Cypher {
-    public static SecretKey keygenKeyGeneration(int keySize) {
-        SecretKey sKey = null;
-        if ((keySize == 128)||(keySize == 192)||(keySize == 256)) {
-            try {
-                KeyGenerator kgen = KeyGenerator.getInstance("AES");
-                kgen.init(keySize);
-                sKey = kgen.generateKey();
-            } catch (NoSuchAlgorithmException ex) {
-                System.err.println("Generador no disponible.");
-            }
-        }
-        return sKey;
+    PrivateKey privateKey;
+    PublicKey publicKey;
+
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(PrivateKey privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public void RSAKeyGenerator() throws NoSuchAlgorithmException {
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(2048);
+        KeyPair pair = generator.generateKeyPair();
+        privateKey = pair.getPrivate();
+        publicKey = pair.getPublic();
+        setPrivateKey(privateKey);
+        setPublicKey(publicKey);
     }
 }
