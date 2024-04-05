@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,8 +77,10 @@ public class ClientClass {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        Cypher cypherClient = new Cypher();
         ClientClass clientClass = new ClientClass();
         clientClass.connect("localhost", 9090);
+        cypherClient.RSAKeyGenerator();
     }
 }
