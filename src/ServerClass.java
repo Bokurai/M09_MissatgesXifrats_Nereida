@@ -91,9 +91,7 @@ public class ServerClass {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        Cypher cypherServer = new Cypher();
         ServerClass tcpSocketServer = new ServerClass();
         tcpSocketServer.listen();
-        cypherServer.RSAKeyGenerator();
     }
 }

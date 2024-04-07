@@ -1,34 +1,31 @@
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.security.*;
 
 public class Cypher {
-    PrivateKey privateKey;
-    PublicKey publicKey;
+    public KeyPair generateKeys() throws NoSuchAlgorithmException {
+        KeyPair keyPair = null;
 
-    public PrivateKey getPrivateKey() {
-        return privateKey;
+        KeyPairGenerator k = KeyPairGenerator.getInstance("RSA");
+        k.initialize(1024);
+        keyPair = k.genKeyPair();
+
+        return keyPair;
     }
 
-    public void setPrivateKey(PrivateKey privateKey) {
-        this.privateKey = privateKey;
+    public byte[] cypher(PublicKey publicKey, byte[] content) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        byte[] cypherData = cipher.doFinal(content);
+        return cypherData;
     }
 
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
-    }
-
-    public void RSAKeyGenerator() throws NoSuchAlgorithmException {
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(2048);
-        KeyPair pair = generator.generateKeyPair();
-        privateKey = pair.getPrivate();
-        publicKey = pair.getPublic();
-        setPrivateKey(privateKey);
-        setPublicKey(publicKey);
+    public byte[] decypher(PrivateKey privateKey, byte[] content) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        byte[] deCypherData = cipher.doFinal(content);
+        return deCypherData;
     }
 }

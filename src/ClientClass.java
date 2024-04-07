@@ -1,16 +1,17 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ClientClass {
+    Cypher cypher = new Cypher();
     private Scanner sc = new Scanner(System.in);
 
     public void connect(String address, int port) {
@@ -18,22 +19,30 @@ public class ClientClass {
         String request;
         boolean continueConnected=true;
         Socket socket;
-        BufferedReader in;
-        PrintStream out;
+        ObjectInputStream in;
+        ObjectOutputStream out;
+
+
         try {
+            KeyPair clientKeys = cypher.generateKeys();
+            PublicKey publicKey = clientKeys.getPublic();
+            PrivateKey privateKey = clientKeys.getPrivate();
+
             socket = new Socket(InetAddress.getByName(address), port);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
+
+            out.writeObject(publicKey);
+            out.flush();
+
+            PublicKey serverKey = (PublicKey) in.readObject();
+
             //el client atén el port fins que decideix finalitzar
             while(continueConnected){
-                serverData = in.readLine();
-                //processament de les dades rebudes i obtenció d'una nova petició
-                request = getRequest(serverData);
-                //enviament de la petició
-                out.println(request);//assegurem que acaba amb un final de línia
+
+                out.writeObject(e);
+
                 out.flush(); //assegurem que s'envia
-                //comprovem si la petició és un petició de finalització i en cas
-                //que ho sigui ens preparem per sortir del bucle
                 continueConnected = mustFinish(request);
             }
 
@@ -42,6 +51,10 @@ public class ClientClass {
             System.out.printf("Error de connexió. No existeix el host, %s", ex);
         } catch (IOException ex) {
             System.out.printf("Error de connexió indefinit, %s", ex);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -51,11 +64,6 @@ public class ClientClass {
         else return true;
     }
 
-    private String getRequest(String serverData) {
-        System.out.println("servidor$ " + serverData);
-        System.out.print("$ ");
-        return sc.nextLine();
-    }
 
     private void close(Socket socket){
         //si falla el tancament no podem fer gaire cosa, només enregistrar
@@ -78,9 +86,7 @@ public class ClientClass {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        Cypher cypherClient = new Cypher();
         ClientClass clientClass = new ClientClass();
         clientClass.connect("localhost", 9090);
-        cypherClient.RSAKeyGenerator();
     }
 }
